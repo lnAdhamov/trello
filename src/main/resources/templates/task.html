@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/myCss.css">
+</head>
+<body>
+
+<div th:if="${#authorization.expression('hasRole(''ROLE_USER'')')}">
+    <div class="container-fluid">
+        <div class="row">
+
+            <div class="col-10 main-content">
+
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-10 offset-1">
+            <div class="row">
+                <div class="offset-10 p-3">
+                    <div class="d-flex">
+                        <a class="btn btn-dark mr-2" th:href="'/board/'+${boardId}">Back</a>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+
+                <div class="card-header">
+                    <div>
+                        Name:
+                        <h1 th:text="${currentTask.getTitle()}">
+                        </h1>
+                    </div>
+                    <h5>
+                        <small class="text-dark"
+                               th:text="${'created by: '+currentTask.createdBy.getFirstName()+', at: '+currentTask.formatCreatedAt()}">
+                        </small>
+                    </h5>
+                    <small class="text-dark"
+                           th:text="${currentTask.getDeadline()!=null?'deadline: '+currentTask.formatDeadLine():'deadline: no exact time has been set'}">
+                    </small>
+                    <h5>
+                        <small class="text-dark"
+                               th:text="${currentTask.getTaskList().getTitle().equalsIgnoreCase('completed')?'finished at: '+currentTask.formatFinishedAt():'finshed at: not finished yet'}">
+                        </small>
+                    </h5>
+
+                    <hr>
+                    <h5>TaskList</h5>
+                    <div class="card">
+                        <div class="row">
+                            <div>
+                                <button class="btn btn-dark text-white px-5"
+                                        th:text="${currentTask.getTaskList().getTitle()}"></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <h3 class="mb-0">Members</h3>
+                        </div>
+                    </div>
+                    <div th:each="member : ${currentTask.getMembers()}">
+                        <div class="member-info">
+                            <div class="photo">
+                                <img width="40" height="40" th:src="${member.showPhoto()}" alt="User Photo"/>
+                            </div>
+                            <div class="details">
+                                <small th:text="${member.firstName} + ' ' + ${member.lastName}"></small>
+                                <div th:if="${member.photo == null}">
+                                    <p>No photo available</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <h3 class="mb-0">Attachments</h3>
+                        </div>
+                        <div class="col-auto">
+                            <form action="/task/addfile" method="post" enctype="multipart/form-data">
+                                <input type="hidden" name="taskId" th:value="${currentTask.getId()}">
+                                <input type="hidden" name="boardId" th:value="${boardId}">
+                                <div class="form-group d-flex align-items-center">
+                                    <label for="file" class="form-label mb-0" style="margin-right: 5px;">File</label>
+                                    <input type="file" class="form-control-file" name="file"
+                                           accept=".jpg, .jpeg, .png, .pdf" required style="margin-right: 5px;">
+                                    <button type="submit" class="btn btn-outline-success">+</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div th:each="attachment : ${attachments}">
+                        <div class="member-info">
+                            <div class="details">
+                                <small th:text="${'name: '+attachment.getName()+' type: '+attachment.getContentType()}"></small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                Comments
+                <ul type="none" class="list-group">
+                    <tr th:each="comment:${comments}">
+                        <div th:if="${currentTask.equals(comment.getTask())}">
+                            <li class="mt-4"
+                                th:text="${comment.getCommentedBy().getFirstName()+' at: '+comment.formatCommentedAt()}">
+                            </li>
+                            <li class="bg-dark text-white list-group-item w-50" th:text="${comment.getText()}">
+                            </li>
+                        </div>
+                    </tr>
+                </ul>
+            </div>
+            <div class="card-footer">
+                <form action="/task/addcomment" method="POST">
+                    <input type="hidden" name="taskId" th:value="${currentTask.getId()}">
+                    <input type="hidden" name="boardId" th:value="${boardId}">
+                    <div class="input-group">
+                        <input placeholder="add comment.." type="text" name="text" class="form-control w-75">
+                        <div class="input-group-append">
+                            <button class="btn btn-dark">add</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-10 main-content">
+
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-10 offset-1">
+            <div class="row">
+                <div class="offset-10 p-3">
+                    <div class="d-flex">
+                        <a class="btn btn-dark mr-2" th:href="'/board/'+${boardId}">Back</a>
+                        <form th:action="'/task/delete/'+${currentTask.getId()}" method="get">
+                            <input type="hidden" name="boardId" th:value="${boardId}">
+                            <button type="submit" class="btn btn-danger">delete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+
+                <div class="card-header">
+                    <div>
+                        Name:
+                        <form action="/task/applyname" method="post">
+                            <input type="hidden" name="currentTaskId" th:value="${currentTask.getId()}">
+                            <input type="hidden" name="boardId" th:value="${boardId}">
+                            <div class="input-group my-3">
+                                <input type="text" name="title" th:value="${currentTask.getTitle()}"
+                                       class="form-control w-75">
+                                <div class="input-group-append">
+                                    <button class="btn btn-success">apply</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <h5>
+                        <small class="text-dark"
+                               th:text="${'created by: '+currentTask.createdBy.getFirstName()+', at: '+currentTask.formatCreatedAt()}">
+                        </small>
+                    </h5>
+                    <div>
+                        Deadline:
+                        <form action="/task/applydeadline" method="post">
+                            <input type="hidden" name="taskId" th:value="${currentTask.getId()}">
+                            <input type="hidden" name="boardId" th:value="${boardId}">
+                            <div class="input-group my-3">
+                                <input type="datetime-local" name="deadline" th:value="${currentTask.getDeadline()}"
+                                       class="form-control w-75">
+                                <div class="input-group-append">
+                                    <button class="btn btn-success">Apply</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <h5>
+                        <small class="text-dark"
+                               th:text="${currentTask.getTaskList().getTitle().equalsIgnoreCase('completed')?'finished at: '+currentTask.formatFinishedAt():'finshed at: not finished yet'}">
+                        </small>
+                    </h5>
+
+                    <hr>
+                    <h5>Tasklists:</h5>
+                    <div class="card">
+                        <div class="row">
+                            <div th:each="taskList:${taskLists}">
+                                <form th:action="'/task/changetasklist/'+${currentTask.getId()}" method="post">
+                                    <input type="hidden" name="taskListId" th:value="${taskList.getId()}">
+                                    <input type="hidden" name="boardId" th:value="${boardId}">
+                                    <button th:class="${currentTask.getTaskList().equals(taskList)?'btn btn-dark text-white px-5':'btn btn-light text-dark px-5'}"
+                                            th:text="${taskList.getTitle()}"></button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <h3 class="mb-0">Members</h3>
+                        </div>
+                        <div class="col-auto">
+                            <form action="/task/addmember" method="post">
+                                <input type="hidden" name="taskId" th:value="${currentTask.getId()}"/>
+                                <input type="hidden" name="boardId" th:value="${boardId}"/>
+                                <div class="mb-3">
+                                    <label for="member" class="form-label">Members</label>
+                                    <div class="d-flex align-items-center">
+                                        <select class="form-control" id="member" name="member"
+                                                style="margin-right: 5px;"
+                                                required>
+                                            <option selected disabled>select member</option>
+                                            <option th:each="user : ${users}" th:value="${user.id}"
+                                                    th:text="${user.firstName} + ' ' + ${user.lastName}"></option>
+                                        </select>
+                                        <button type="submit" class="btn btn-outline-success">+</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div th:each="member : ${currentTask.getMembers()}">
+                        <div class="member-info">
+                            <div class="photo">
+                                <img width="40" height="40" th:src="${member.showPhoto()}" alt="User Photo"/>
+                            </div>
+                            <div class="details">
+                                <small th:text="${member.firstName} + ' ' + ${member.lastName}"></small>
+                                <form th:action="'/task/removemember/'+${member.getId()}" method="get">
+                                    <input type="hidden" name="taskId" th:value="${currentTask.getId()}">
+                                    <input type="hidden" name="boardId" th:value="${boardId}">
+                                    <button class="btn">❌</button>
+                                </form>
+                                <div th:if="${member.photo == null}">
+                                    <p>No photo available</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <h3 class="mb-0">Attachments</h3>
+                        </div>
+                        <div class="col-auto">
+                            <form action="/task/addfile" method="post" enctype="multipart/form-data">
+                                <input type="hidden" name="taskId" th:value="${currentTask.getId()}">
+                                <input type="hidden" name="boardId" th:value="${boardId}">
+                                <div class="form-group d-flex align-items-center">
+                                    <label for="file" class="form-label mb-0" style="margin-right: 5px;">File</label>
+                                    <input type="file" class="form-control-file" id="file" name="file"
+                                           accept=".jpg, .jpeg, .png, .pdf" required style="margin-right: 5px;">
+                                    <button type="submit" class="btn btn-outline-success">+</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div th:each="attachment : ${attachments}">
+                        <div class="member-info">
+                            <div class="details">
+                                <small th:text="${'name: '+attachment.getName()+' type: '+attachment.getContentType()}"></small>
+                                <form th:action="'/task/removefile/'+${attachment.getId()}" method="get">
+                                    <input type="hidden" name="taskId" th:value="${currentTask.getId()}">
+                                    <input type="hidden" name="boardId" th:value="${boardId}">
+                                    <button class="btn">❌</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                Comments
+                <ul type="none" class="list-group">
+                    <tr th:each="comment:${comments}">
+                        <div th:if="${currentTask.equals(comment.getTask())}">
+                            <li class="mt-4"
+                                th:text="${comment.getCommentedBy().getFirstName()+' at: '+comment.formatCommentedAt()}">
+                            </li>
+                            <li class="bg-dark text-white list-group-item w-50" th:text="${comment.getText()}">
+                            </li>
+                        </div>
+                    </tr>
+                </ul>
+            </div>
+            <div class="card-footer">
+                <form action="/task/addcomment" method="POST">
+                    <input type="hidden" name="taskId" th:value="${currentTask.getId()}">
+                    <input type="hidden" name="boardId" th:value="${boardId}">
+                    <div class="input-group">
+                        <input placeholder="add comment.." type="text" name="text" class="form-control w-75">
+                        <div class="input-group-append">
+                            <button class="btn btn-dark">add</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

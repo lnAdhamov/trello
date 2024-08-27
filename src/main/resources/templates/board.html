@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Board</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/myCss.css">
+</head>
+<body>
+<div th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+    <nav class="navbar bg-body-tertiary bg-dark">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <a href="/" class="navbar-brand text-light">Spring Trello</a>
+            <div class="d-flex">
+                <form th:action="'/board/'+${currentBoard.getId()}" class="mr-2">
+                    <button class="btn btn-outline-light">all tasks</button>
+                </form>
+                <form th:action="'/board/'+${currentBoard.getId()}">
+                    <input type="hidden" name="userId" th:value="${currentUser.getId()}">
+                    <button class="btn btn-outline-light">my tasks</button>
+                </form>
+            </div>
+            <div th:if="${#authorization.expression('isAuthenticated()')}" class="d-flex align-items-center">
+                <a class="navbar-brand text-light mr-2" th:text="${#authentication.name}"></a>
+                <a class="btn btn-outline-success mr-2" th:href="'/tasklist/add?boardId='+${currentBoard.getId()}">+ new
+                    List</a>
+                <a class="btn btn-outline-light mr-2" href="/report">Report</a>
+                <a class="btn btn-outline-danger" href="/logout">Log Out</a>
+            </div>
+        </div>
+    </nav>
+
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-2 border-right sidebar">
+                <a class="navbar-brand text-dark offset-1 mt-2">Boards</a>
+                <ul class="list-group p-3">
+                    <a th:each="board : ${boards}" th:href="'/board/' + ${board.id}">
+                        <li th:class="${currentBoard.getId().equals(board.getId())}?'list-group-item text-light my-1 bg-dark':'list-group-item text-dark my-1'"
+                            th:text="${board.title}">
+                        </li>
+                    </a>
+                    <a href="/board/add">
+                        <li class="list-group-item my-1 btn-outline-dark">+ new board</li>
+                    </a>
+                </ul>
+            </div>
+
+            <div class="col-10 main-content">
+                <div class="row">
+                    <div th:each="taskList : ${taskLists}" class="col-md-4 custom-card">
+                        <div th:if="${currentBoard.id == taskList.board.id}">
+                            <div class="card">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <h3 th:text="${taskList.title}" class="mb-0"></h3>
+                                        <form th:action="'/tasklist/edit/' + ${taskList.id}" method="get"
+                                              class="d-inline ml-2">
+                                            <input name="boardId" type="hidden" th:value="${currentBoard.id}">
+                                            <button class="btn btn-outline-info" type="submit">✏️</button>
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="card-body mb-3">
+                                    <div th:each="task : ${tasks}">
+                                        <div th:if="${taskList.id == task.taskList.id}">
+                                            <form th:action="'/task/edit/'+${task.id}" method="get" class="d-inline">
+                                                <input name="boardId" type="hidden" th:value="${currentBoard.id}">
+                                                <button type="submit" th:text="${task.title}"
+                                                        th:class="${!task.isCompletedBeforeDeadline()? 'btn btn-danger mt-4 text-white' :
+                                                        (task.isFinishedBeforeDeadline()?'btn btn-success mt-4 text-white' :(task.isFinishedAfterDeadLine()?'btn btn-warning mt-4 text-white':'btn btn-light mt-4 text-dark'))}">
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <form action="/task/add" method="get">
+                                        <input name="taskListId" type="hidden" th:value="${taskList.getId()}">
+                                        <button class="btn btn-light mt-4 text-dark">+ new card</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:if="${#authorization.expression('hasRole(''ROLE_USER'')')}">
+    <nav class="navbar bg-body-tertiary bg-dark">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <a href="/" class="navbar-brand text-light">Spring Trello</a>
+            <div class="d-flex">
+                <form th:action="'/board/'+${currentBoard.getId()}" class="mr-2">
+                    <button class="btn btn-outline-light">all tasks</button>
+                </form>
+                <form th:action="'/board/'+${currentBoard.getId()}">
+                    <input type="hidden" name="userId" th:value="${currentUser.getId()}">
+                    <button class="btn btn-outline-light">my tasks</button>
+                </form>
+            </div>
+            <div th:if="${#authorization.expression('isAuthenticated()')}" class="d-flex align-items-center">
+                <a class="navbar-brand text-light mr-2" th:text="${#authentication.name}"></a>
+                <a class="btn btn-outline-danger" href="/logout">Log Out</a>
+            </div>
+        </div>
+    </nav>
+
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-2 border-right sidebar">
+                <a class="navbar-brand text-dark offset-1 mt-2">Boards</a>
+                <ul class="list-group p-3">
+                    <a th:each="board : ${boards}" th:href="'/board/' + ${board.id}">
+                        <li th:class="${currentBoard.getId().equals(board.getId())}?'list-group-item text-light my-1 bg-dark':'list-group-item text-dark my-1'"
+                            th:text="${board.title}">
+                        </li>
+                    </a>
+                </ul>
+            </div>
+
+            <div class="col-10 main-content">
+                <div class="row">
+                    <div th:each="taskList : ${taskLists}" class="col-md-4 custom-card">
+                        <div th:if="${currentBoard.id == taskList.board.id}">
+                            <div class="card">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <h3 th:text="${taskList.title}" class="mb-0"></h3>
+                                    </div>
+                                </div>
+                                <div class="card-body mb-3">
+                                    <div th:each="task : ${tasks}">
+                                        <div th:if="${taskList.id == task.taskList.id}">
+                                            <form th:action="'/task/edit/'+${task.id}" method="get" class="d-inline">
+                                                <input name="boardId" type="hidden" th:value="${currentBoard.id}">
+                                                <button type="submit" th:text="${task.title}"
+                                                        th:class="${!task.isCompletedBeforeDeadline()? 'btn btn-danger mt-4 text-white' :
+                                                        (task.isFinishedBeforeDeadline()?'btn btn-success mt-4 text-white' :(task.isFinishedAfterDeadLine()?'btn btn-warning mt-4 text-white':'btn btn-light mt-4 text-dark'))}">
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

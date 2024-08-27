@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/myCss.css">
+</head>
+<body>
+
+<nav class="navbar bg-body-tertiary bg-dark">
+    <div class="container-fluid">
+        <a href="/" class="navbar-brand text-light">Spring Trello</a>
+        <div th:if="${#authorization.expression('isAuthenticated()')}">
+            <a class="navbar-brand text-light" th:text="${#authentication.name}"></a>
+            <a class="btn btn-outline-light" href="/report">Report</a>
+            <a class="btn btn-outline-danger" href="/logout">Log Out</a>
+        </div>
+    </div>
+</nav>
+
+<div th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-2 border-right sidebar">
+                <a class="navbar-brand text-dark offset-1 mt-2">Boards</a>
+                <ul class="list-group p-3">
+                    <a th:each="board : ${boards}" th:href="'/board/' + ${board.id}">
+                        <li th:class="${currentBoard.getId().equals(board.getId())}?'list-group-item text-light my-1 bg-dark':'list-group-item text-dark my-1'"
+                            th:text="${board.title}">
+                        </li>
+                    </a>
+                    <a href="/board/add">
+                        <li class="list-group-item my-1 btn-outline-dark">+ new board</li>
+                    </a>
+                </ul>
+            </div>
+
+            <div class="col-10 main-content">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:if="${#authorization.expression('hasRole(''ROLE_USER'')')}">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-2 border-right sidebar">
+                <a class="navbar-brand text-dark offset-1 mt-2">Boards</a>
+                <ul class="list-group p-3">
+                    <a th:each="board : ${boards}" th:href="'/board/' + ${board.id}">
+                        <li th:class="${currentBoard.getId().equals(board.getId())}?'list-group-item text-light my-1 bg-dark':'list-group-item text-dark my-1'"
+                            th:text="${board.title}">
+                        </li>
+                    </a>
+                </ul>
+            </div>
+
+            <div class="col-10 main-content">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

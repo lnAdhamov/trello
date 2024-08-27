@@ -1,0 +1,31 @@
+.member-info {
+    display: flex; /* Use flexbox to layout children in a row */
+    align-items: center; /* Align items vertically in the center */
+    margin-bottom: 10px; /* Add space between each member's information */
+}
+
+.photo {
+    margin-right: 10px; /* Add some space between the photo and the name */
+}
+
+.card {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.card-body {
+    min-height: 150px; /* Adjust the height as needed */
+}
+
+.custom-card {
+    flex: 1 1 30%; /* Width of the card */
+    margin: 10px; /* Space between cards */
+}
+
+.sidebar {
+    padding-right: 0;
+}
+
+.main-content {
+    margin-left: -15px; /* Adjust this value to make the main content closer to the sidebar */
+}

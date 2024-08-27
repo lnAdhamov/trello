@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add taskList</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="row mt-4">
+    <div class="col-8 offset-2">
+        <div class="card p-3">
+            <form action="/tasklist/add" method="POST">
+                <input name="title" class="form-control my-3" type="text" placeholder="enter title">
+                <input type="hidden" name="orderNumber" th:value="${maxOrder}">
+                <input type="hidden" name="boardId" th:value="${boardId}">
+                <button class="btn btn-dark mt3" type="submit">save</button>
+                <a class="btn btn-danger" th:href="'/board/'+${boardId}">cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

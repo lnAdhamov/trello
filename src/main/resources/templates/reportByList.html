@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Report</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+</head>
+<body>
+
+<nav class="navbar bg-body-tertiary bg-dark">
+    <div class="container-fluid">
+        <a href="/" class="navbar-brand text-light">Spring Trello</a>
+        <div th:if="${#authorization.expression('isAuthenticated()')}">
+            <a class="navbar-brand text-light" th:text="${#authentication.name}"></a>
+            <a class="btn btn-outline-danger" href="/logout">Log Out</a>
+        </div>
+    </div>
+</nav>
+
+<div class="row">
+    <div class="col-3 border-right">
+        <ul class="list-group p-3">
+            <a href="/report/bylist">
+                <li class="list-group-item bg-dark text-white my-1">By Lists</li>
+            </a>
+            <a href="/report/byuser">
+                <li class="list-group-item text-dark my-1">By Users</li>
+            </a>
+        </ul>
+    </div>
+    <div class="col-9">
+
+        <div class="row">
+            <h3 class="p-3">Report By Lists</h3>
+            <div class="offset-8 p-3">
+                <a class="btn btn-dark" href="/">Back</a>
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="p-4">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>List</th>
+                    <th>tasks</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="entry : ${taskListCounts}">
+                    <td th:text="${entry.key}"></td>
+                    <td th:text="${entry.value}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

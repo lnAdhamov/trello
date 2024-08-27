@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Board</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="row mt-4">
+    <div class="col-8 offset-2">
+        <div class="card p-3">
+            <form action="/board/add" method="POST">
+                <input name="title" class="form-control my-3" type="text" placeholder="enter title">
+                <button class="btn btn-dark mt3" type="submit">save</button>
+                <a class="btn btn-danger mt-3" href="/">cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

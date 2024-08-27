@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Task List</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+</head>
+<body>
+
+<div th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+    <div class="row mt-4">
+        <div class="col-8 offset-2">
+            <div class="card p-3">
+                <form th:action="'/tasklist/edit/'+${currentTaskList.getId()}" method="POST">
+                    <input type=hidden name="id" th:value="${currentTaskList.getId()}">
+                    <input type="text" class="form-control my-3" name="title" th:value="${currentTaskList.getTitle()}">
+                    <select name="orderNumber" class="form-control ">
+                        <option selected disabled>Select Order</option>
+                        <option th:text="${order}" th:selected="${currentTaskList.getOrderNumber()==order}"
+                                th:value="${order}" th:each="order:${orders}">
+                        </option>
+                    </select>
+                    <input type="hidden" name="boardId" th:value="${boardId}">
+                    <button class="btn btn-dark mt-3" type="submit">save</button>
+                </form>
+                <form th:action="'/tasklist/delete/'+${currentTaskList.getId()}" method="get">
+                    <input type="hidden" name="boardId" th:value="${boardId}">
+                    <button class="btn btn-danger mt-3" type="submit">delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
